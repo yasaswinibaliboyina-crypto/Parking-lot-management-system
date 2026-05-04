@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Parking Lot System</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f2f2f2;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .box {
+            background: white;
+            padding: 20px;
+            margin: 15px auto;
+            width: 300px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px gray;
+        }
+
+        input {
+            display: block;
+            margin: 5px auto;
+            padding: 8px;
+            width: 80%;
+        }
+
+        button {
+            padding: 8px 15px;
+            background: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: darkblue;
+        }
+
+        #output {
+            text-align: left;
+            white-space: pre;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🚗 Parking Lot Management</h1>
+
+<div class="box">
+    <h2>Vehicle Entry</h2>
+    <input id="vnum" placeholder="Vehicle Number">
+    <input id="hour" placeholder="Hour (0-23)">
+    <input id="min" placeholder="Minute (0-59)">
+    <button onclick="entry()">Enter</button>
+</div>
+
+<div class="box">
+    <h2>Vehicle Exit</h2>
+    <input id="exitVnum" placeholder="Vehicle Number">
+    <input id="exitHour" placeholder="Hour (0-23)">
+    <input id="exitMin" placeholder="Minute (0-59)">
+    <button onclick="exitVehicle()">Exit</button>
+</div>
+
+<div class="box">
+    <h2>Parking Status</h2>
+    <button onclick="display()">Show Status</button>
+    <pre id="output"></pre>
+</div>
+
+<script>
+async function entry() {
+    let res = await fetch('/entry', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            vnum: document.getElementById('vnum').value,
+            hour: document.getElementById('hour').value,
+            min: document.getElementById('min').value
+        })
+    });
+
+    let data = await res.json();
+    alert(data.message);
+}
+
+async function exitVehicle() {
+    let res = await fetch('/exit', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            vnum: document.getElementById('exitVnum').value,
+            hour: document.getElementById('exitHour').value,
+            min: document.getElementById('exitMin').value
+        })
+    });
+
+    let data = await res.json();
+    alert("Time: " + data.parkingTime + "\nFee: " + data.fee);
+}
+
+async function display() {
+    let res = await fetch('/display');
+    let data = await res.json();
+
+    document.getElementById('output').innerText =
+        data.slots.join("\n") + "\nQueue: " + data.queue;
+}
+</script>
+
+</body>
+</html>
